@@ -1,8 +1,5 @@
-﻿using Alaric.Api.Constants;
-using Alaric.Api.Helpers;
-using Alaric.DB;
+﻿using Alaric.DB;
 using Alaric.DB.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -15,19 +12,15 @@ namespace Alaric.Api.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class AController : ControllerBase
+    public class SynController : ControllerBase
     {
-        private readonly IHttpContextAccessor _contextAccessor;
         private readonly AppDbContext _context;
 
-        public AController(AppDbContext context, IHttpContextAccessor contextAccessor)
+        public SynController(AppDbContext context)
         {
             if (context == null)
                 throw new ArgumentNullException("context");
             _context = context;
-            if (contextAccessor == null)
-                throw new ArgumentNullException("contextAccessor");
-            _contextAccessor = contextAccessor;
         }
         // GET: api/<AController>
         [HttpGet]
@@ -45,40 +38,21 @@ namespace Alaric.Api.Controllers
 
         // POST api/<AController>
         [HttpPost]
-        public async void Post([FromBody] AModel pAModel)
+        public void Post([FromBody] AModel pAModel)
         {
             pAModel.modifyDt = DateTime.Now;
             _context.AModels.Add(pAModel);
             _context.SaveChanges();
-            try
-            {
-                if (_contextAccessor.HttpContext.Request.Scheme + "://" + _contextAccessor.HttpContext.Request.Host.Value == Urls.url1)
-                {
-                    await HttpHelper.Post<AModel>(Urls.url2, "Syn", pAModel);
-                }
-                else
-                {
-                    await HttpHelper.Post<AModel>(Urls.url1, "Syn", pAModel);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
         }
 
         // PUT api/<AController>/5
-        [HttpPut("{id}")]
-        public async Task<ActionResult> Put(int id, [FromBody] AModel value)
+        [HttpPut]
+        public ActionResult Put([FromBody] AModel value)
         {
-            if (id != value.Id)
-            {
-                return BadRequest("Wrong Id error");
-            }
-
+            
             value.modifyDt = DateTime.Now;
 
-            AModel model = _context.AModels.Find(id);
+            AModel model = _context.AModels.Find(value.Id);
             if (model == null)
             {
                 return NotFound("Sent value not found");
@@ -94,22 +68,6 @@ namespace Alaric.Api.Controllers
             model.tradeSize = value.tradeSize;
 
             _context.SaveChanges();
-
-            try
-            {
-                if (_contextAccessor.HttpContext.Request.Scheme + "://" + _contextAccessor.HttpContext.Request.Host.Value == Urls.url1)
-                {
-                    await HttpHelper.Put<AModel>(Urls.url2, "Syn", value);
-                }
-                else
-                {
-                    await HttpHelper.Post<AModel>(Urls.url1, "Syn", value);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
 
             return Ok(value);
         }
