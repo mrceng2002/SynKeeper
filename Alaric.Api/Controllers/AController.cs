@@ -103,7 +103,7 @@ namespace Alaric.Api.Controllers
                 }
                 else
                 {
-                    await HttpHelper.Post<AModel>(Urls.url1, "Syn", value);
+                    await HttpHelper.Put<AModel>(Urls.url1, "Syn", value);
                 }
             }
             catch (Exception ex)
