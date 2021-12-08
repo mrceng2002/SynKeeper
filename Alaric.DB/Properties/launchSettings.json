@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Alaric.DB": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}
